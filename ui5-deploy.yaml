@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "3.1"
+metadata:
+  name: imageupload
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          destination: S4H
+          url: http://192.168.1.25:8011
+        app:
+          name: Z_IMAGE_UPLOAD
+          description: Image uploader
+          package: ZFIORI
+          transport: S4HK902707
+        exclude:
+          - /test/
