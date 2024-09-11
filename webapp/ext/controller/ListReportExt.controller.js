@@ -49,6 +49,7 @@ sap.ui.define([
                     text: "Cancel",
                     press: function () {
                         this._oUploadDialog.close();
+                        oFileUploader.clear();
                     }.bind(this)
                 })
             });
@@ -71,6 +72,28 @@ sap.ui.define([
 
             reader.onload = function(evt) {
                 that._base64Image = evt.target.result.split(",")[1];
+                var oSelectedRecord = that.fetchSelectedRecord();
+                if (oSelectedRecord) {
+                    var sRecordId = oSelectedRecord.ImageId;
+                    oModelData.read("/ZRAP_CM_ImageUpload('" + sRecordId + "')",{
+                        success: function(oData){
+                            // console.log(oData);
+                            if (oData.ImageData) {
+                                // Compare with the base64 image data
+                                if (oData.ImageData === that._base64Image) {
+                                    that._oUploadDialog.close();
+                                    MessageToast.show("This image is already exists.");
+                                    var oFileUploader = sap.ui.getCore().byId("fileUploader"); // Get the file uploader by ID
+                                    if (oFileUploader) {
+                                        oFileUploader.clear(); // Clear the selected file
+                                    }
+                                }
+                            }
+                        }, error: function(){
+                            console.log("cannot get data");
+                        }
+                    });
+                }
                 MessageToast.show("Image converted to Base64 successfully.");
             };
 
@@ -93,7 +116,7 @@ sap.ui.define([
             if (oSelectedRecord) {
                 var sRecordId = oSelectedRecord.ImageId;
                 var sImageName = oSelectedRecord.ImageName;
-
+                
                 var oPayload = {
                     ImageId: sRecordId,
                     ImageName: sImageName,
@@ -107,13 +130,12 @@ sap.ui.define([
                 oModelData.update(sUpdatePath, oPayload, {
                     success: function(oData) {
                         MessageToast.show("Image uploaded and associated successfully.");
-                        // if (this.extensionAPI && this.extensionAPI.refreshTable) {
-                        //     this.extensionAPI.refreshTable();
-                        // } else {
-                        //     console.error("extensionAPI or refreshTable method not found.");
-                        // }
                         this.extensionAPI.refreshTable();
                         this._displayImageLink(oPayload.ImageURL);
+                        var oFileUploader = sap.ui.getCore().byId("fileUploader"); // Get the file uploader by ID
+                        if (oFileUploader) {
+                            oFileUploader.clear(); // Clear the selected file
+                        }
                     }.bind(this),
                     error: function(oError) {
                         MessageToast.show("Failed to upload image.");
@@ -130,7 +152,7 @@ sap.ui.define([
             var oExtensionAPI = this.extensionAPI;
             if (oExtensionAPI) {
                 var aSelectedContexts = oExtensionAPI.getSelectedContexts();
-
+                // console.log(aSelectedContexts);
                 if (aSelectedContexts && aSelectedContexts.length > 0) {
                     var oSelectedRecord = aSelectedContexts[0].getObject();
                     return oSelectedRecord;
