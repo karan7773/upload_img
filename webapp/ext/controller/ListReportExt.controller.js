@@ -3,11 +3,8 @@ sap.ui.define([
     "sap/ui/unified/FileUploader",
     "sap/m/Button",
     "sap/m/MessageToast",
-    "sap/ui/model/odata/v2/ODataModel",
-    "sap/m/Link",
-    "sap/m/Popover",
-    "sap/m/Image",
-], function(Dialog, FileUploader, Button, MessageToast, ODataModel, Link, Popover, Image) {
+    "sap/ui/model/odata/v2/ODataModel"
+], function(Dialog, FileUploader, Button, MessageToast, ODataModel) {
     'use strict';
 
     var ServiceUrl = "/sap/opu/odata/sap/ZRAP_SB_IMAGEUPLOAD/";
@@ -131,7 +128,6 @@ sap.ui.define([
                     success: function(oData) {
                         MessageToast.show("Image uploaded and associated successfully.");
                         this.extensionAPI.refreshTable();
-                        this._displayImageLink(oPayload.ImageURL);
                         var oFileUploader = sap.ui.getCore().byId("fileUploader"); // Get the file uploader by ID
                         if (oFileUploader) {
                             oFileUploader.clear(); // Clear the selected file
@@ -164,40 +160,6 @@ sap.ui.define([
                 MessageToast.show("extensionAPI not available.");
                 return null;
             }
-        },
-        _displayImageLink: function (sImageUrl) {
-            var oLink = new Link({
-              text: "View Image",
-              href: sImageUrl,
-              target: "_blank",
-              press: function (oEvent) {
-                oEvent.preventDefault(); // Prevent default navigation
-                this._showImageInPopover(sImageUrl);
-              }.bind(this)
-            });
-       
-            // Add the link to the UI, for example in a VBox
-            var oVBox = this.getView().byId("contentVBox"); // Assuming there is a VBox with id 'contentVBox'
-            if (oVBox) {
-              oVBox.addItem(oLink);
-            }
-        },
-       
-          // Function to show image in a popover
-        _showImageInPopover: function (sImageUrl) {
-            var oImage = new Image({
-                src: sImageUrl,
-                width: "300px",
-                height: "300px"
-            });
-       
-            var oPopover = new Popover({
-                title: "Image Preview",
-                content: [oImage],
-                showHeader: true
-            });
-       
-            oPopover.openBy(oImage);
         }
     };
 });
