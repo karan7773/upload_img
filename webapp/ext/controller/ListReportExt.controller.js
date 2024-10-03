@@ -121,7 +121,14 @@ sap.ui.define([
                     ImageURL:`/sap/opu/odata/sap/ZRAP_SB_IMAGEUPLOAD/ZRAP_CM_ImageUpload('${sRecordId}')/ImageData/$value`,
                     MimeType: this._fileType
                 };
+                var jsonStringPayload = JSON.stringify(oPayload);
 
+                var base64EncodedPayload = btoa(jsonStringPayload);
+
+                var finalPayload = {
+                    EncodedData: base64EncodedPayload  
+                };
+                console.log(finalPayload);
                 var sUpdatePath = "/ZRAP_CM_ImageUpload('" + sRecordId + "')";
 
                 oModelData.update(sUpdatePath, oPayload, {
