@@ -157,7 +157,7 @@
                             }
                         },
                         "tableSettings": {
-                            "type": "ResponsiveTable"
+                            "type": "GridTable"
                         }
                     }
                 },
